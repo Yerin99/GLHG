@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Large model files
+Blenderbot_small-90M/pytorch_model.bin
+/data/pretrained_models/
+
+# Training outputs
+*.log
+*.pkl
+*.pt
+*.pth
+*.ckpt
+
+# Data
+DATA/
+_reformat/*.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Environment
+venv/
+env/
+.env

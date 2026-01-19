@@ -14,9 +14,17 @@ from torch.nn.utils.rnn import pad_sequence
 from math import ceil
 from inputters.inputter_utils import _norm, BucketSampler, BucketingDataLoader, DistributedBucketingDataLoader
 
-tokenizer_gpt = GPT2Tokenizer.from_pretrained('/data/pretrained_models/comet-distill-tokenizer')
-# fixme cuda
-model_gpt = GPT2LMHeadModel.from_pretrained('/data/pretrained_models/comet-distill-high').cuda()
+# COMET 모델을 지연 로드 (필요할 때만 로드)
+tokenizer_gpt = None
+model_gpt = None
+
+def _load_comet_model():
+    global tokenizer_gpt, model_gpt
+    if tokenizer_gpt is None:
+        print("Loading COMET model from local path...")
+        tokenizer_gpt = GPT2Tokenizer.from_pretrained('/data/pretrained_models/comet-distill-tokenizer')
+        model_gpt = GPT2LMHeadModel.from_pretrained('/data/pretrained_models/comet-distill-high').cuda()
+        print("✓ COMET model loaded successfully")
 # comet_type = ['xWant', 'xReact']
 comet_type = ['xIntent']
 react_type = ['xReact']
@@ -90,6 +98,7 @@ def featurize(
 
 
 def convert_data_to_inputs(data, toker: PreTrainedTokenizer, **kwargs):
+    _load_comet_model()  # COMET 모델 로드
     process = lambda x: toker.convert_tokens_to_ids(toker.tokenize(x))
 
     dialog = data['dialog']
