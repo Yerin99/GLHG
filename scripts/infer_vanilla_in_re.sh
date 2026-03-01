@@ -15,32 +15,30 @@ export CUDA_VISIBLE_DEVICES=0
 INPUTTER_NAME="vanilla_in_re"
 CONFIG_NAME="vanilla_in_re"
 
-# 체크포인트 경로 (훈련된 모델 경로로 수정 필요)
-# 훈련 완료 후 생성된 경로를 사용하세요
-# 예: ./DATA/vanilla_in_re.vanilla_in_re/2026-01-1912345.3e-05.16.1gpu/epoch-4.bin
-CHECKPOINT_PATH="./DATA/vanilla_in_re.vanilla_in_re/TIMESTAMP/epoch-4.bin"  # 실제 경로로 변경 필요
+# 체크포인트 경로 (epoch-1: 가장 낮은 PPL 16.73)
+CHECKPOINT_PATH="./DATA/vanilla_in_re.vanilla_in_re/2026-01-19180015.3e-05.16.1gpu/epoch-1.bin"
 
 # 추론 데이터 파일 경로
 # ESConv 데이터셋을 process.py로 처리한 결과 파일 경로로 수정하세요
 # 예: ./_reformat/test.txt
 INFER_FILE="./_reformat/test.txt"
 
-# 추론 하이퍼파라미터
-INFER_BATCH_SIZE=1          # 논문: 1
-MAX_LENGTH=40               # 논문: 40 decoding steps
-MIN_LENGTH=5
-MAX_INPUT_LENGTH=128
+# 추론 하이퍼파라미터 (infer_bos.out 기준)
+INFER_BATCH_SIZE=1          # 논문: batch size = 1 (infer_bos.out은 16이지만 논문 따름)
+MAX_LENGTH=40               # infer_bos.out 기준
+MIN_LENGTH=10               # infer_bos.out 기준
+MAX_INPUT_LENGTH=128        # 논문: max length of input sequence = 128
 MAX_DECODER_INPUT_LENGTH=50
 SEED=42
 
-# 생성 전략 설정
-NUM_BEAMS=1                 # Beam search (1=greedy)
-TOP_K=0                     # Top-k sampling (0=disabled)
-TOP_P=1.0                   # Top-p (nucleus) sampling
-TEMPERATURE=1.0             # Temperature
-LENGTH_PENALTY=1.0          # Length penalty
-REPETITION_PENALTY=1.0      # Repetition penalty
-NO_REPEAT_NGRAM=0           # No repeat n-gram size
+# 생성 전략 설정 (infer_bos.out 기준)
+NUM_BEAMS=1                 # infer_bos.out
+TOP_K=0                     # infer_bos.out
+TOP_P=0.9                   # infer_bos.out (nucleus sampling)
+TEMPERATURE=0.7             # infer_bos.out
+LENGTH_PENALTY=1.0          # infer_bos.out
+REPETITION_PENALTY=1.0      # infer_bos.out
+NO_REPEAT_NGRAM=3           # infer_bos.out
 
 # ============================================================================
 # 추론 실행
