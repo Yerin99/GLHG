@@ -14,10 +14,15 @@ Blenderbot_small-90M/pytorch_model.bin
 
 # Training outputs
 *.log
+*.out
 *.pkl
 *.pt
 *.pth
 *.ckpt
+logs/
+
+# Paper PDF (copyright)
+*.pdf
 
 # Data
 DATA/
