@@ -87,6 +87,10 @@ cd /home/yerin/baseline/GLHG
 bash scripts/prepare_glhg.sh
 ```
 
+> **COMET 모델**: COMET-BART-AI2 (`mismayil/comet-bart-ai2`) 사용.
+> 경로: `/home/yerin/pretrained_models/comet-bart-ai2`
+> (comet-distill-high는 학습되지 않은 GPT-2 base로 사용 불가)
+
 ### 2. 훈련
 
 논문 설정 (learning rate: 3e-5, batch size: 16, epochs: 5):

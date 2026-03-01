@@ -15,7 +15,7 @@ conda activate glhg
 필요한 사전 준비물:
 - GPU (COMET 추론 포함, 최소 11GB VRAM 권장)
 - BlenderBot-Small-90M 모델 가중치: `./Blenderbot_small-90M/`
-- COMET (comet-atomic-2020) 모델: `/data/pretrained_models/comet-distill-high` (로컬 경로)
+- COMET-ATOMIC-2020-BART 모델: `/home/yerin/pretrained_models/comet-bart-ai2` (mismayil/comet-bart-ai2)
 
 ---
 
@@ -93,11 +93,14 @@ bash scripts/infer_glhg.sh ./DATA/glhg.glhg/2026-02-28133257.3e-05.16.1gpu/epoch
 cat DATA/glhg.glhg/<timestamp>/res_*/metric.json
 ```
 
-**재현 실험 결과** (2026-02-28, epoch-1):
+**재현 실험 결과** (2026-03-01, COMET-BART-AI2, epoch-2):
 
 | PPL↓ | B-1↑ | B-2↑ | B-4↑ | D-1↑ | D-2↑ | R-L↑ |
 |------|------|------|------|------|------|------|
-| 16.35 | 17.72 | 6.36 | 1.57 | 3.64 | 21.99 | 15.63 |
+| 16.31 | 17.26 | 6.49 | 1.84 | 3.88 | 22.32 | 16.18 |
+
+> 이전 결과 (2026-02-28, comet-distill-high 사용 — 비학습 모델, 결과 무효):
+> PPL 16.35, B-1 17.72, B-2 6.36, B-4 1.57, D-1 3.64, D-2 21.99, R-L 15.63
 
 **논문 보고 수치** (IJCAI 2022, Table 1):
 
@@ -113,7 +116,7 @@ cat DATA/glhg.glhg/<timestamp>/res_*/metric.json
 |------|------|
 | `models/glhg_blenderbot_small.py` | GLHG 메인 모델 (Multi-source Encoder + Fusion Gate + Decoder) |
 | `models/hierarchical_graph.py` | Hierarchical Graph Reasoner (2-layer GAT) |
-| `inputters/glhg.py` | 데이터 처리 (COMET xReact/xIntent 포함) |
+| `inputters/glhg.py` | 데이터 처리 (COMET xIntent, COMET-BART-AI2 사용) |
 | `CONFIG/glhg.json` | 모델 설정 |
 | `scripts/prepare_glhg.sh` | 전처리 스크립트 |
 | `scripts/train_glhg.sh` | 학습 스크립트 |
@@ -127,5 +130,5 @@ cat DATA/glhg.glhg/<timestamp>/res_*/metric.json
 
 - **Problem type 수**: 논문은 12개, 코드 구현은 13개로 불일치 존재
 - **GAT head 수**: 논문 본문 미기재, 코드 구현은 4-head
-- **COMET 관계**: xReact + xIntent 사용 (xWant/xEffect/xNeed는 KEMI에서 사용)
+- **COMET 관계**: xIntent만 사용. comet-distill-high는 손상된 모델(base GPT-2, COMET 학습 없음)이므로 COMET-BART-AI2로 교체함.
 - `Blenderbot_small-90M/pytorch_model.bin`은 용량이 크므로 git 관리 제외 (`.gitignore` 처리됨)

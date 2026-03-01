@@ -12,7 +12,7 @@ import tqdm
 import torch
 from typing import List
 from transformers.tokenization_utils import PreTrainedTokenizer
-from transformers import GPT2LMHeadModel, GPT2Tokenizer
+from transformers import BartForConditionalGeneration, BartTokenizer
 import numpy as np
 import random
 from functools import partial
@@ -24,6 +24,8 @@ from inputters.inputter_utils import _norm, BucketSampler, BucketingDataLoader, 
 # COMET 모델 지연 로드
 tokenizer_gpt = None
 model_gpt = None
+
+COMET_BART_PATH = '/home/yerin/pretrained_models/comet-bart-ai2'
 
 # Problem type 매핑 (ESConv 데이터셋 기준 13개 problem types)
 PROBLEM_TYPES = [
@@ -45,48 +47,47 @@ PROBLEM_TO_ID = {p: i for i, p in enumerate(PROBLEM_TYPES)}
 
 
 def _load_comet_model():
-    """COMET 모델 로드 (최초 호출 시에만)"""
+    """COMET-BART-AI2 모델 로드 (최초 호출 시에만)"""
     global tokenizer_gpt, model_gpt
     if tokenizer_gpt is None:
-        print("Loading COMET model from local path...")
-        tokenizer_gpt = GPT2Tokenizer.from_pretrained('/data/pretrained_models/comet-distill-tokenizer')
-        model_gpt = GPT2LMHeadModel.from_pretrained('/data/pretrained_models/comet-distill-high').cuda()
-        print("✓ COMET model loaded successfully")
-
-
-def _transfer_to_comet(text: str, relation_type: str) -> str:
-    """COMET 입력 형식으로 변환"""
-    return f"<head> {text} </head> <relation> {relation_type} </relation> [GEN] "
+        print("Loading COMET-BART-AI2 model...")
+        tokenizer_gpt = BartTokenizer.from_pretrained(COMET_BART_PATH)
+        model_gpt = BartForConditionalGeneration.from_pretrained(COMET_BART_PATH).cuda()
+        model_gpt.eval()
+        print("✓ COMET-BART-AI2 loaded successfully")
 
 
 def _generate_comet_inference(text: str, relation_type: str = 'xIntent') -> str:
     """
-    COMET을 사용하여 xIntent 추론 생성
-    
+    COMET-BART-AI2를 사용하여 commonsense 추론 생성
+
     Args:
         text: 마지막 help-seeker 발화
         relation_type: COMET relation type (기본: xIntent)
-    
+
     Returns:
-        생성된 intention 텍스트
+        생성된 intention 텍스트 (e.g. "to feel better.")
     """
     _load_comet_model()
-    comet_str = _transfer_to_comet(text, relation_type)
-    inp = tokenizer_gpt(comet_str)['input_ids']
-    
+    if not text.strip():
+        return "none."
+
+    inp_str = f"{text} {relation_type}"
+    inp_ids = tokenizer_gpt.encode(inp_str, return_tensors='pt').cuda()
+
     with torch.no_grad():
         output = model_gpt.generate(
-            input_ids=torch.tensor(inp).view(1, -1).cuda(),
+            inp_ids,
+            max_length=20,
             num_beams=3,
-            max_length=8 + len(inp),
             num_return_sequences=1,
-            pad_token_id=50256
+            pad_token_id=tokenizer_gpt.pad_token_id,
+            early_stopping=True,
         )
-    
-    gen = tokenizer_gpt.decode(output.tolist()[0])
-    intention = gen[gen.index(']') + 1:]
-    intention = intention.split('.')[0] + "."
-    return intention
+
+    intention = tokenizer_gpt.decode(output[0], skip_special_tokens=True).strip()
+    intention = intention.split('.')[0].strip()
+    return intention + "." if intention else "none."
 
 
 class Inputter(object):
