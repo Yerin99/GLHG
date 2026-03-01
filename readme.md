@@ -1,5 +1,14 @@
 # Control Globally, Understand Locally: A Global-to-Local Hierarchical Graph Network for Emotional Support Conversation.
 
+> **Note**: This is a reproduction of the IJCAI 2022 paper by Peng et al. The original repository is [pengwei-iie/GLHG](https://github.com/pengwei-iie/GLHG). This fork contains a full reimplementation including the Hierarchical Graph Reasoner (`models/hierarchical_graph.py`) and GLHG inputter (`inputters/glhg.py`).
+
+## Documentation
+
+- [`docs/GLHG_GUIDE.md`](docs/GLHG_GUIDE.md) — Step-by-step 실행 가이드 (prepare → train → infer) 및 재현 결과
+- [`docs/GLHG_IMPLEMENTATION.md`](docs/GLHG_IMPLEMENTATION.md) — 아키텍처 상세 설명 (Multi-source Encoder, Hierarchical Graph Reasoner, Global-guide Decoder)
+
+---
+
 This is the repository of our IJCAI 2022 paper Control Globally, Understand Locally: A Global-to-Local Hierarchical Graph Network for Emotional Support Conversation.
 
 If your want to make a **human evaluation** with GLHG. **The results are available in generation-glhg.json**. And **automatic evaluation** can be use in the following.
